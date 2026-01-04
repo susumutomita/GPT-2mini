@@ -1,0 +1,40 @@
+{
+  "name": "typescript-template",
+  "version": "1.0.0",
+  "author": "Susumu Tomita <oyster880@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "install:all": "cd packages/frontend && bun install && cd ../backend && bun install",
+    "dev": "cd packages/frontend && bun run start",
+    "build": "cd packages/frontend && bun run build && cd ../backend && bun run build",
+    "clean": "bunx rimraf node_modules out && cd packages/frontend && bunx rimraf node_modules out dist coverage && cd ../backend && bunx rimraf node_modules out dist coverage",
+    "test": "cd packages/frontend && bun run test && cd ../backend && bun run test",
+    "test:coverage": "cd packages/frontend && bun run test:coverage && cd ../backend && bun run test:coverage",
+    "test:watch": "cd packages/frontend && bun run test:watch && cd ../backend && bun run test:watch",
+    "lint": "cd packages/frontend && bun run lint && cd ../backend && bun run lint",
+    "lint:fix": "cd packages/frontend && bun run lint:fix && cd ../backend && bun run lint:fix",
+    "lint:text": "bunx textlint ./README.md",
+    "lint-staged": "lint-staged",
+    "format": "cd packages/frontend && bun run format && cd ../backend && bun run format",
+    "format:check": "cd packages/frontend && bun run format:check && cd ../backend && bun run format:check",
+    "prepare": "husky",
+    "start:frontend": "cd packages/frontend && bun run start",
+    "start:backend": "cd packages/backend && bun run start"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "oxfmt": "^0.16.0",
+    "rimraf": "^6.1.2",
+    "textlint": "^15.4.1",
+    "@textlint-ja/textlint-rule-preset-ai-writing": "^1.6.1",
+    "textlint-rule-ja-no-abusage": "^3.0.0",
+    "textlint-rule-ja-no-inappropriate-words": "^2.0.0",
+    "textlint-rule-no-double-negative-ja": "^2.0.1",
+    "textlint-rule-no-dropping-the-ra": "^3.0.0",
+    "textlint-rule-prefer-tari-tari": "^1.0.3",
+    "textlint-rule-preset-ja-spacing": "^2.2.0",
+    "textlint-rule-preset-ja-technical-writing": "^12.0.2",
+    "textlint-rule-spellcheck-tech-word": "^5.0.0"
+  }
+}
