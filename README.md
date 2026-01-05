@@ -1,10 +1,10 @@
 # GPT-2 mini (PyTorch, Mac/MPS) — 学習して仕組みを理解するための最小実装
 
-このリポジトリは「LLMの仕組み理解」を目的に、Decoder-only Transformer（GPT-2系）を **小さく実装して学習** します。
+このリポジトリは「LLM の仕組み理解」を目的に、Decoder-only Transformer（GPT-2 系）を **小さく実装して学習** します。
 
 - 目的：実装の完成度や最速化ではなく、**学習が成立する条件 / 失敗する条件を観測して腹落ち** させる
 - 実装方針：`nn.Transformer` は使わず、Attention / MLP / LayerNorm / Residual を自前で組む
-- 実行環境：Mac（MPS）優先。無ければCPUで動作
+- 実行環境：Mac（MPS）優先。無ければ CPU で動作
 
 ---
 
@@ -17,7 +17,7 @@ pip install torch
 
 ### 2) データ（任意）
 
-学習用テキストを `data.txt` として置く（UTF-8のプレーンテキスト）。
+学習用テキストを `data.txt` として置く（UTF-8 のプレーンテキスト）。
 なければスクリプト内の小さなサンプルで動きます（学習は弱いので推奨は `data.txt`）。
 
 ### 3) 学習
@@ -72,7 +72,7 @@ python train_gpt2_mini.py --data data.txt --disable_attention 1 --steps 1500
 ---
 
 ## Roadmap（短期）
-- loss/grad_norm に加えて activation統計（LN前後）をログ化
+- loss/grad_norm に加えて activation 統計（LN 前後）をログ化
 - attention entropy をログ化（「どれだけ鋭く見ているか」）
 - 学習を安定させるハイパラ（LR, warmup, weight decay）比較
 - （余力があれば）BPE/tokenizer と小規模データセットでの比較
