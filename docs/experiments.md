@@ -35,7 +35,7 @@
   python train_gpt2_mini.py --data data.txt --steps 2000
   ```
 - 期待：
-  - lossが下がる
+  - loss が下がる
   - 生成がデータの癖を持ち始める
 
 ---
@@ -47,11 +47,11 @@
   python train_gpt2_mini.py --data data.txt --disable_residual 1 --steps 800
   ```
 - 観測ポイント：
-  - lossが下がりにくい/発散しやすい
-  - grad_normが不安定になるか
+  - loss が下がりにくい/発散しやすい
+  - grad_norm が不安定になるか
 - 理解メモ：
-  - residualが「情報の高速道路」になっている
-  - deepになるほど必要性が増す
+  - residual が「情報の高速道路」になっている
+  - deep になるほど必要性が増す
 
 ---
 
@@ -63,7 +63,7 @@
   ```
 - 観測ポイント：
   - 学習の立ち上がりが遅い/発散しやすい
-  - LR依存が強くなる傾向
+  - LR 依存が強くなる傾向
 
 ---
 
