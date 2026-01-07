@@ -510,6 +510,17 @@ def main():
     parser.add_argument("--log_interval", type=int, default=100, help="Log every N steps")
     parser.add_argument("--sample_interval", type=int, default=500, help="Generate sample every N steps")
 
+    # Checkpoint
+    parser.add_argument("--save", type=str, default="model.pt", help="Path to save checkpoint")
+    parser.add_argument("--load", type=str, default=None, help="Path to load checkpoint")
+
+    # Inference mode
+    parser.add_argument("--generate", action="store_true", help="Generate only (no training)")
+    parser.add_argument("--interactive", action="store_true", help="Interactive generation mode")
+    parser.add_argument("--prompt", type=str, default=None, help="Prompt for generation")
+    parser.add_argument("--max_tokens", type=int, default=200, help="Max tokens to generate")
+    parser.add_argument("--temperature", type=float, default=0.8, help="Sampling temperature")
+
     args = parser.parse_args()
 
     # Device
@@ -569,21 +580,82 @@ def main():
     # Create model
     model = GPT2Mini(config).to(device)
 
-    # Train
-    train(
-        model=model,
-        dataset=dataset,
-        config=config,
-        steps=args.steps,
-        batch_size=args.batch_size,
-        device=device,
-        log_interval=args.log_interval,
-        sample_interval=args.sample_interval,
-    )
+    # Load checkpoint if specified
+    if args.load and os.path.exists(args.load):
+        checkpoint = torch.load(args.load, map_location=device, weights_only=False)
+        model.load_state_dict(checkpoint["model"])
+        # Restore vocab mapping
+        dataset.stoi = checkpoint["stoi"]
+        dataset.itos = checkpoint["itos"]
+        print(f"Loaded checkpoint from {args.load}")
 
-    # Final generation
-    print("\n=== Final Generation ===")
-    generate_sample(model, dataset, device, prompt="吾輩は")
+    # Mode selection
+    if args.interactive:
+        # Interactive mode
+        interactive_generate(model, dataset, device, args.temperature, args.max_tokens)
+    elif args.generate:
+        # Generate only
+        prompt = args.prompt if args.prompt else "吾輩は"
+        print(f"\n=== Generation (prompt: {repr(prompt)}) ===")
+        idx = torch.tensor([dataset.encode(prompt)], dtype=torch.long, device=device)
+        model.eval()
+        generated = model.generate(idx, max_new_tokens=args.max_tokens, temperature=args.temperature, top_k=40)
+        print(dataset.decode(generated[0].tolist()))
+    else:
+        # Train mode
+        train(
+            model=model,
+            dataset=dataset,
+            config=config,
+            steps=args.steps,
+            batch_size=args.batch_size,
+            device=device,
+            log_interval=args.log_interval,
+            sample_interval=args.sample_interval,
+        )
+
+        # Save checkpoint
+        checkpoint = {
+            "model": model.state_dict(),
+            "config": config,
+            "stoi": dataset.stoi,
+            "itos": dataset.itos,
+        }
+        torch.save(checkpoint, args.save)
+        print(f"\nCheckpoint saved to {args.save}")
+
+        # Final generation
+        print("\n=== Final Generation ===")
+        generate_sample(model, dataset, device, prompt="吾輩は")
+
+        print(f"\nTo generate more text:")
+        print(f"  python train_gpt2_mini.py --load {args.save} --generate --prompt '好きなテキスト'")
+        print(f"  python train_gpt2_mini.py --load {args.save} --interactive")
+
+
+def interactive_generate(model: GPT2Mini, dataset: CharDataset, device: str, temperature: float, max_tokens: int):
+    """インタラクティブ生成モード"""
+    model.eval()
+    print("\n=== Interactive Mode ===")
+    print("Enter a prompt and press Enter to generate. Type 'quit' to exit.\n")
+
+    while True:
+        try:
+            prompt = input("Prompt> ").strip()
+            if prompt.lower() in ["quit", "exit", "q"]:
+                print("Bye!")
+                break
+            if not prompt:
+                continue
+
+            idx = torch.tensor([dataset.encode(prompt)], dtype=torch.long, device=device)
+            generated = model.generate(idx, max_new_tokens=max_tokens, temperature=temperature, top_k=40)
+            print("\n" + dataset.decode(generated[0].tolist()) + "\n")
+        except KeyboardInterrupt:
+            print("\nBye!")
+            break
+        except Exception as e:
+            print(f"Error: {e}")
 
 
 if __name__ == "__main__":
