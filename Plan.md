@@ -105,6 +105,9 @@ GPT2Mini
   - --generate: 推論のみモード
   - --interactive: 対話的生成モード
   - .gitignore にモデルファイルを追加
+- [2026-01-07] ブログ記事 2 本公開（PR #198）
+  - gpt2-mini-transformer-learning.md: Transformer の仕組み解説
+  - gpt2-mini-to-claude-evolution.md: GPT-2 から Claude への進化
 
 **検証結果**:
 | 設定 | 30step後 Loss | 特徴 |
