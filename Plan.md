@@ -18,27 +18,33 @@
 **タスク (TODOs)**:
 
 #### Phase 1: コアモジュール実装
-- [ ] Token Embedding + Positional Embedding
-- [ ] Causal Self-Attention（Multi-Head）
-- [ ] MLP（Feed-Forward Network）
-- [ ] Transformer Block（Pre-LN / Post-LN 切替可能）
-- [ ] GPT モデル全体
+- [x] Token Embedding + Positional Embedding
+- [x] Causal Self-Attention（Multi-Head）
+- [x] MLP（Feed-Forward Network）
+- [x] Transformer Block（Pre-LN / Post-LN 切替可能）
+- [x] GPT モデル全体
 
 #### Phase 2: 学習インフラ
-- [ ] Character-level Tokenizer（シンプル実装）
-- [ ] データローダー（data.txt 読み込み）
-- [ ] 学習ループ（AdamW, grad clipping）
-- [ ] ロギング（loss, grad_norm）
+- [x] Character-level Tokenizer（シンプル実装）
+- [x] データローダー（data.txt 読み込み）
+- [x] 学習ループ（AdamW, grad clipping）
+- [x] ロギング（loss, grad_norm）
 
 #### Phase 3: 実験スイッチ
-- [ ] `--disable_residual`: Residual 接続を無効化
-- [ ] `--disable_attention`: Attention を無効化（MLP-only）
-- [ ] `--ln_style pre|post`: LayerNorm の位置切替
+- [x] `--disable_residual`: Residual 接続を無効化
+- [x] `--disable_attention`: Attention を無効化（MLP-only）
+- [x] `--ln_style pre|post`: LayerNorm の位置切替
 
 #### Phase 4: 生成と検証
-- [ ] テキスト生成（sampling, temperature）
-- [ ] 学習中のサンプル生成
-- [ ] MPS/CPU デバイス自動選択
+- [x] テキスト生成（sampling, temperature）
+- [x] 学習中のサンプル生成
+- [x] MPS/CPU デバイス自動選択
+
+#### Phase 5: 追加機能
+- [x] チェックポイント保存・読み込み（--save/--load）
+- [x] 推論専用モード（--generate）
+- [x] 対話モード（--interactive）
+- [x] ブログ記事執筆（Transformer 解説 + GPT→Claude 進化）
 
 **検証手順 (Validation)**:
 ```bash
