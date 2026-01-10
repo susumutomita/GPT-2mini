@@ -134,3 +134,18 @@ dist
 # PyTorch model checkpoints
 *.pt
 *.pth
+
+# Python
+__pycache__/
+*.pyc
+
+# Data directories
+data/
+aozora_data/
+
+# Generated samples
+samples_*.png
+scaling_plot*.png
+
+# Experiment results (keep JSON for reference but ignore large ones)
+scaling_results_full.json
