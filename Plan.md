@@ -125,6 +125,146 @@ GPT2Mini
 
 ---
 
+### スケーリング則観測実験 - 2026-01-10
+
+**目的 (Objective)**:
+- パラメータ数と Loss の関係（スケーリング則）を観測する
+- 複数モデルサイズで実験し、べき乗則をフィッティング
+
+**タスク (TODOs)**:
+- [x] データ量確認（data.txt: 881K 文字）
+- [x] スケーリング実験スクリプト作成（run_scaling_experiment.py）
+- [x] 可視化スクリプト作成（plot_scaling.py）
+- [x] フル実験実行（5モデル × 2000ステップ）
+
+**実行方法**:
+```bash
+# クイック実験（3モデル × 500ステップ、約3分）
+python run_scaling_experiment.py --data data.txt --quick
+
+# フル実験（5モデル × 2000ステップ、約60分）
+python run_scaling_experiment.py --data data.txt --steps 2000
+
+# 結果の可視化
+python plot_scaling.py scaling_results.json --output scaling_plot.png
+```
+
+**実験結果**:
+| Model | Params | Val Loss | 時間 |
+|-------|--------|----------|------|
+| tiny | 344K | 3.92 | 82s |
+| small | 1.28M | 3.44 | 4.5m |
+| medium | 3.40M | 3.07 | 10m |
+| base | 5.71M | 2.86 | 15m |
+| large | 15.7M | 2.37 | 32m |
+
+**スケーリング則**:
+```
+L = 20.89 × N^(-0.129)
+```
+- べき乗指数: 0.129
+- Chinchilla 論文参考値: 0.076
+- 差の理由: データ量（881K文字）と学習トークン数（16M）が論文より少ない
+
+**進捗ログ (Progress Log)**:
+- [2026-01-10] スケーリング実験インフラ構築
+  - run_scaling_experiment.py: 複数サイズモデルの自動学習
+  - plot_scaling.py: log-log プロット生成
+- [2026-01-10] フル実験完了
+  - 5モデルサイズで学習（344K〜15.7M params）
+  - べき乗則の観測に成功
+
+---
+
+### 拡散モデル（DDPM）実装 - 2026-01-10
+
+**目的 (Objective)**:
+- Denoising Diffusion Probabilistic Model（DDPM）を単一ファイルで実装
+- 画像生成の仕組みを「壊して観測して理解する」
+- GPT-2 mini と同じスタイルで実験スイッチを提供
+
+**制約 (Guardrails)**:
+- 単一ファイル（train_diffusion_mini.py）で完結
+- Mac（MPS）優先、無ければ CPU で動作
+- PyTorch のみ依存
+- MNIST で動作確認（28x28、シンプル）
+
+**タスク (TODOs)**:
+
+#### Phase 1: コアモジュール実装
+- [ ] ノイズスケジューラ（β スケジュール、α 累積）
+- [ ] U-Net アーキテクチャ（ダウン → ミドル → アップ）
+- [ ] 時刻埋め込み（Sinusoidal Embedding）
+- [ ] ResBlock（残差接続 + 時刻条件付け）
+
+#### Phase 2: 学習インフラ
+- [ ] MNIST データローダー
+- [ ] 学習ループ（ノイズ予測損失）
+- [ ] ロギング（loss 推移）
+
+#### Phase 3: 生成と検証
+- [ ] サンプリング（逆拡散過程）
+- [ ] 生成画像の保存
+- [ ] 学習中のサンプル生成
+
+#### Phase 4: 実験スイッチ
+- [ ] `--disable_residual`: ResBlock の残差を無効化
+- [ ] `--disable_time_emb`: 時刻埋め込みを無効化
+- [ ] `--noise_schedule linear|cosine`: ノイズスケジュール切替
+
+**アーキテクチャ設計**:
+```
+DDPM
+├── time_mlp: 時刻埋め込み（Sinusoidal → MLP）
+├── down_blocks: ダウンサンプリング
+│   ├── ResBlock(ch, ch)
+│   ├── ResBlock(ch, ch)
+│   └── Downsample(ch)
+├── mid_block: ボトルネック
+│   ├── ResBlock(ch, ch)
+│   └── ResBlock(ch, ch)
+├── up_blocks: アップサンプリング
+│   ├── ResBlock(ch*2, ch)  # skip connection
+│   ├── ResBlock(ch, ch)
+│   └── Upsample(ch)
+└── out_conv: 最終出力
+```
+
+**拡散過程**:
+```
+Forward:  x_0 → x_1 → ... → x_T（ノイズ追加）
+Reverse:  x_T → x_{T-1} → ... → x_0（ノイズ除去）
+
+q(x_t | x_0) = N(√ᾱ_t x_0, (1-ᾱ_t) I)
+p(x_{t-1} | x_t) = N(μ_θ(x_t, t), σ_t² I)
+```
+
+**デフォルトハイパーパラメータ**:
+- image_size: 28（MNIST）
+- channels: 64
+- timesteps: 1000
+- beta_start: 1e-4
+- beta_end: 0.02
+- learning_rate: 2e-4
+
+**検証手順 (Validation)**:
+```bash
+# 基本動作確認
+python train_diffusion_mini.py --steps 1000
+
+# 生成サンプル確認
+python train_diffusion_mini.py --steps 5000 --sample
+
+# 実験スイッチ確認
+python train_diffusion_mini.py --disable_time_emb 1 --steps 1000
+python train_diffusion_mini.py --noise_schedule cosine --steps 1000
+```
+
+**進捗ログ (Progress Log)**:
+- [2026-01-10 開始] Plan.md 作成、実装開始
+
+---
+
 ## 振り返り (Retrospective)
 
 ### 問題1: データ長 < block_size でクラッシュ
