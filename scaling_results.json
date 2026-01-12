@@ -1,0 +1,52 @@
+{
+  "experiment": "scaling_law",
+  "data_path": "data.txt",
+  "data_size": 881023,
+  "steps": 500,
+  "batch_size": 32,
+  "learning_rate": 0.0003,
+  "results": [
+    {
+      "name": "tiny",
+      "n_layer": 2,
+      "n_head": 2,
+      "n_embd": 64,
+      "n_params": 343936,
+      "train_loss": 4.865325927734375,
+      "val_loss": 4.892019100189209,
+      "elapsed_seconds": 22.804101943969727,
+      "tokens_per_second": 179616.80797884427,
+      "steps": 500,
+      "batch_size": 32,
+      "block_size": 256
+    },
+    {
+      "name": "small",
+      "n_layer": 4,
+      "n_head": 4,
+      "n_embd": 128,
+      "n_params": 1281024,
+      "train_loss": 4.17172908782959,
+      "val_loss": 4.173964557647705,
+      "elapsed_seconds": 54.8691132068634,
+      "tokens_per_second": 74650.37724516467,
+      "steps": 500,
+      "batch_size": 32,
+      "block_size": 256
+    },
+    {
+      "name": "medium",
+      "n_layer": 6,
+      "n_head": 6,
+      "n_embd": 192,
+      "n_params": 3401088,
+      "train_loss": 3.991372585296631,
+      "val_loss": 3.9347522115707396,
+      "elapsed_seconds": 140.7158088684082,
+      "tokens_per_second": 29108.314360260796,
+      "steps": 500,
+      "batch_size": 32,
+      "block_size": 256
+    }
+  ]
+}
